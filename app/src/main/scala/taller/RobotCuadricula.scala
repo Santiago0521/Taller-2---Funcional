@@ -77,5 +77,46 @@ class RobotCuadricula {
   // Punto 5 -------------------------------------------------------------------
 
   /** Una orden equivalente más corta, con las reglas del enunciado. */
-  def simplificar(o: Orden): Orden = ???
+  def simplificar(o: Orden): Orden = {
+    def esNada(orden: Orden): Boolean = orden match {
+      case Secuencia(Nil) => true
+      case _ => false
+    }
+
+    def construir(ordenes: List[Orden]): Orden = ordenes match {
+      case Nil => Secuencia(Nil)
+      case orden :: Nil => orden
+      case varias => Secuencia(varias)
+    }
+
+    def normalizar(ordenes: List[Orden]): List[Orden] = ordenes match {
+      case Nil => Nil
+      
+      case Avanzar(0) :: resto => normalizar(resto)
+      case Avanzar(a) :: Avanzar(b) :: resto => normalizar(Avanzar(a + b) :: resto)
+
+      case orden :: resto if esNada(orden) => normalizar(resto)
+      case orden :: resto => orden :: normalizar(resto)
+    }
+
+    def simplificarInterno(orden: Orden): Orden = orden match {
+      case Avanzar(0) => Secuencia(Nil)
+      case Avanzar(n) => Avanzar(n)
+
+      case Girar(sentido) => Girar(sentido)
+
+      case Repetir(veces, _) if veces <= 0 => Secuencia(Nil)
+      case Repetir(1, ordenInterna) => simplificarInterno(ordenInterna)
+      case Repetir(veces, ordenInterna) => 
+        val simplificada = simplificarInterno(ordenInterna)
+        
+        if (esNada(simplificada)) Secuencia(Nil)
+        else Repetir(veces, simplificada)
+
+      case Secuencia(ordenes) => 
+        val simplificadas = ordenes.map(simplificarInterno)
+        construir(normalizar(simplificadas))
+    }
+    simplificarInterno(o)
+  }
 }
