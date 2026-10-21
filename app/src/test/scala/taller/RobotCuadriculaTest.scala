@@ -12,56 +12,55 @@ class RobotCuadriculaTest extends AnyFunSuite {
 
   val cuadrado = Repetir(4, Secuencia(List(Avanzar(1), Girar(Derecha))))
 
-  // Punto 1 -------------------------------------------------------------------
+  // Punto 1: girar ------------------------------------------------------------
 
-  test("girar: Norte a la derecha da Este") { assert(girar(Norte, Derecha) == Este) }
-  test("girar: Norte a la izquierda da Oeste") { assert(girar(Norte, Izquierda) == Oeste) }
-  test("girar: Oeste a la derecha da Norte") { assert(girar(Oeste, Derecha) == Norte) }
-  test("girar: Sur a la izquierda da Este") { assert(girar(Sur, Izquierda) == Este) }
-
-  test("girar: cuatro giros al mismo lado vuelven al principio") {
-    val cuatro = List(Derecha, Derecha, Derecha, Derecha)
-      .foldLeft(Norte: Direccion)((d, s) => girar(d, s))
-    assert(cuatro == Norte)
+  test("girar: Este a la izquierda da Norte") {
+    assert(girar(Este, Izquierda) == Norte)
   }
 
-  test("girar: un giro y su contrario se cancelan") {
-    assert(girar(girar(Este, Derecha), Izquierda) == Este)
+  test("girar: Sur a la derecha da Oeste") {
+    assert(girar(Sur, Derecha) == Oeste)
   }
 
-  // Punto 2 -------------------------------------------------------------------
-
-  test("ejecutar: avanzar tres al norte") {
-    assert(ejecutar(inicial, Avanzar(3)) == Estado(0, 3, Norte))
+  test("girar: Oeste a la izquierda da Sur") {
+    assert(girar(Oeste, Izquierda) == Sur)
   }
 
-  test("ejecutar: una secuencia de avance, giro y avance") {
-    assert(ejecutar(inicial, Secuencia(List(Avanzar(2), Girar(Derecha), Avanzar(4)))) ==
-      Estado(4, 2, Este))
+  test("girar: cuatro giros a la izquierda conservan la dirección inicial") {
+    val cuatro = List(Izquierda, Izquierda, Izquierda, Izquierda)
+      .foldLeft(Este: Direccion)((d, s) => girar(d, s))
+    assert(cuatro == Este)
   }
 
-  test("ejecutar: el cuadrado vuelve al punto de partida") {
-    assert(ejecutar(inicial, cuadrado) == Estado(0, 0, Norte))
+  test("girar: dos giros a la derecha producen la dirección opuesta") {
+    assert(girar(girar(Norte, Derecha), Derecha) == Sur)
   }
 
-  test("ejecutar: avanzar con paso negativo retrocede") {
-    assert(ejecutar(inicial, Avanzar(-2)) == Estado(0, -2, Norte))
+  // Punto 2: ejecutar ---------------------------------------------------------
+
+  test("ejecutar: avanzar negativamente mirando al este") {
+    assert(ejecutar(Estado(4, -2, Este), Avanzar(-3)) ==
+      Estado(1, -2, Este))
   }
 
-  test("ejecutar: repetir cero veces no hace nada") {
-    assert(ejecutar(inicial, Repetir(0, Avanzar(5))) == inicial)
+  test("ejecutar: dos repeticiones de una secuencia combinan avance y giro") {
+    val orden = Repetir(2, Secuencia(List(Avanzar(2), Girar(Derecha))))
+    assert(ejecutar(inicial, orden) == Estado(2, 2, Sur))
   }
 
-  test("ejecutar: la secuencia vacía no hace nada") {
-    assert(ejecutar(inicial, Secuencia(Nil)) == inicial)
+  test("ejecutar: girar a la izquierda antes de avanzar") {
+    val orden = Secuencia(List(Girar(Izquierda), Avanzar(3)))
+    assert(ejecutar(inicial, orden) == Estado(-3, 0, Oeste))
   }
 
-  test("ejecutar: avanzar al sur disminuye y") {
-    assert(ejecutar(Estado(5, 5, Sur), Avanzar(2)) == Estado(5, 3, Sur))
+  test("ejecutar: repetir un número negativo no modifica el estado") {
+    val estado = Estado(-3, 7, Este)
+    assert(ejecutar(estado, Repetir(-2, Avanzar(5))) == estado)
   }
 
-  test("ejecutar: avanzar al oeste disminuye x") {
-    assert(ejecutar(Estado(5, 5, Oeste), Avanzar(2)) == Estado(3, 5, Oeste))
+  test("ejecutar: avanzar positivamente mirando al este aumenta x") {
+    assert(ejecutar(Estado(-2, 7, Este), Avanzar(5)) ==
+      Estado(3, 7, Este))
   }
 
   // Punto 3 -------------------------------------------------------------------
