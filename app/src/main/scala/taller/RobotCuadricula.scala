@@ -34,7 +34,7 @@ class RobotCuadricula {
 
   /** El estado que resulta de aplicarle la orden al estado dado. */
   def ejecutar(e: Estado, o: Orden): Estado = ???
-  
+
   // Punto 3 -------------------------------------------------------------------
 
   /** Cuántos Avanzar y Girar llega a ejecutar la orden, contando repeticiones. */
