@@ -34,7 +34,7 @@ class RobotCuadricula {
 
   /** El estado que resulta de aplicarle la orden al estado dado. */
 
-    def ejecutar(e: Estado, o: Orden): Estado = 
+  def ejecutar(e: Estado, o: Orden): Estado = 
     o match {
 
       case Avanzar(n) =>
