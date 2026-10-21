@@ -1,299 +1,131 @@
-# Informe de corrección
+# Algoritmo Factorial con Recursión de Cola
 
-**Asignatura:** Fundamentos de Programación Funcional y Concurrente  
-**Taller 2:** Un robot en la cuadrícula
+## Definición del Algoritmo
 
-## 1. Introducción
-
-En este documento se argumenta la corrección de las funciones `girar` y `ejecutar`, correspondientes a los puntos 1 y 2 del taller.
-
-Para justificar la corrección se analiza el comportamiento de cada función con respecto a su especificación.
-
-En la función `girar` se utiliza un análisis de casos. Para la función `ejecutar` se analiza cada alternativa del tipo recursivo `Orden` y se utiliza inducción estructural en los casos recursivos.
-
-## 2. Corrección de la función `girar`
-
-La función tiene la siguiente especificación:
-
-```scala
-def girar(d: Direccion, s: Sentido): Direccion
+```Scala
+def factorial(n: Int): BigInt = {
+  @annotation.tailrec
+  def loop(x: Int, acumulador: BigInt): BigInt = {
+    if (x <= 1) acumulador
+    else loop(x - 1, acumulador * x)
+  }
+  loop(n, 1)
+}
 ```
 
-Su objetivo es devolver la dirección resultante de girar 90 grados desde la dirección `d`, siguiendo el sentido `s`.
+* La función `factorial` calcula el factorial de un número `n` utilizando **recursión de cola**.
+* La función interna `loop` es la que hace la recursión:
 
-### 2.1. Especificación matemática
+  * Recibe dos parámetros:
 
-Las direcciones posibles son:
+    * `x`: el valor actual decreciente hasta llegar a 1.
+    * `acumulador`: donde se guarda el resultado parcial en cada paso.
+* El decorador `@annotation.tailrec` obliga a que la función sea optimizada como recursión de cola, es decir, **no se acumulan llamados en la pila**.
 
-\[
-D = \{Norte, Este, Sur, Oeste\}
-\]
-
-Los sentidos posibles son:
-
-\[
-S = \{Izquierda, Derecha\}
-\]
-
-Por lo tanto, existen ocho combinaciones posibles entre una dirección y un sentido.
-
-La especificación de la función es:
-
-| Dirección | Derecha | Izquierda |
-|---|---|---|
-| Norte | Este | Oeste |
-| Este | Sur | Norte |
-| Sur | Oeste | Este |
-| Oeste | Norte | Sur |
-
-### 2.2. Demostración por análisis de casos
-
-La implementación utiliza `match` sobre el par `(d, s)` y contempla las ocho combinaciones posibles.
-
-Para el sentido `Derecha`:
-
-- Si `d = Norte`, el resultado es `Este`.
-- Si `d = Este`, el resultado es `Sur`.
-- Si `d = Sur`, el resultado es `Oeste`.
-- Si `d = Oeste`, el resultado es `Norte`.
-
-Estos resultados corresponden a un giro de 90 grados hacia la derecha.
-
-Para el sentido `Izquierda`:
-
-- Si `d = Norte`, el resultado es `Oeste`.
-- Si `d = Oeste`, el resultado es `Sur`.
-- Si `d = Sur`, el resultado es `Este`.
-- Si `d = Este`, el resultado es `Norte`.
-
-Estos resultados corresponden a un giro de 90 grados hacia la izquierda.
-
-Las ocho combinaciones posibles están contempladas en la función. Por lo tanto, para cualquier dirección y sentido válidos, la función devuelve la dirección correspondiente.
-
-En consecuencia, `girar` es correcta con respecto a su especificación.
-
-## 3. Corrección de la función `ejecutar`
-
-La función tiene la siguiente especificación:
-
-```scala
-def ejecutar(e: Estado, o: Orden): Estado
-```
-
-Su objetivo es devolver el estado que resulta de aplicar la orden `o` al estado inicial `e`.
-
-Un estado puede representarse como:
-
-\[
-e = (x,y,d)
-\]
-
-donde `x` e `y` representan las coordenadas del robot y `d` representa su dirección.
-
-La demostración se realiza analizando cada alternativa del tipo `Orden`.
-
-## 3.1. Caso `Avanzar(n)`
-
-La especificación establece que el robot debe desplazarse `n` unidades en la dirección hacia la que está orientado.
-
-Si:
-
-\[
-e=(x,y,Norte)
-\]
-
-entonces:
-
-\[
-ejecutar(e,Avanzar(n))=(x,y+n,Norte)
-\]
-
-Si:
-
-\[
-e=(x,y,Este)
-\]
-
-entonces:
-
-\[
-ejecutar(e,Avanzar(n))=(x+n,y,Este)
-\]
-
-Si:
-
-\[
-e=(x,y,Sur)
-\]
-
-entonces:
-
-\[
-ejecutar(e,Avanzar(n))=(x,y-n,Sur)
-\]
-
-Si:
-
-\[
-e=(x,y,Oeste)
-\]
-
-entonces:
-
-\[
-ejecutar(e,Avanzar(n))=(x-n,y,Oeste)
-\]
-
-En todos los casos se modifica únicamente la coordenada correspondiente al desplazamiento y se conserva la dirección.
-
-Además, cuando `n` es negativo, las mismas expresiones producen un desplazamiento en sentido contrario.
-
-Por lo tanto, el caso `Avanzar(n)` es correcto.
-
-## 3.2. Caso `Girar(sentido)`
-
-La orden `Girar(sentido)` debe cambiar la orientación del robot sin modificar su posición.
-
-La implementación produce:
-
-\[
-(x,y,girar(d,s))
-\]
-
-donde `d` es la dirección actual y `s` es el sentido del giro.
-
-Como se demostró anteriormente que `girar` es correcta, la nueva dirección corresponde al giro solicitado.
-
-Las coordenadas `x` e `y` permanecen iguales.
-
-Por lo tanto, el caso `Girar(sentido)` es correcto.
-
-## 3.3. Caso `Repetir(veces, orden)`
-
-La orden `Repetir` ejecuta una orden varias veces.
+## Explicación paso a paso
 
 ### Caso base
 
-Si:
+```Scala
+if (x <= 1) acumulador
+```
 
-\[
-veces \leq 0
-\]
-
-la función devuelve el estado original:
-
-\[
-ejecutar(e,Repetir(veces,orden))=e
-\]
-
-Esto es correcto porque una cantidad de repeticiones igual a cero o negativa no debe producir ningún movimiento.
+Cuando `x` llega a `1`, la función retorna directamente el valor acumulado, evitando más llamadas.
 
 ### Caso recursivo
 
-Si:
+```Scala
+loop(x - 1, acumulador * x)
+```
 
-\[
-veces > 0
-\]
+En cada llamada:
 
-la función ejecuta primero la orden una vez:
+* Se reduce el valor de `x` en 1.
+* Se multiplica el acumulador por `x` y se pasa a la siguiente iteración.
+* Como es recursión de cola, la llamada recursiva es la **última instrucción** en ejecutarse, lo que permite a Scala optimizar la pila.
 
-\[
-e' = ejecutar(e,orden)
-\]
+---
 
-y después ejecuta la misma orden con una repetición menos:
+## Llamados de pila en recursión de cola
 
-\[
-ejecutar(e',Repetir(veces-1,orden))
-\]
+Ejemplo:
 
-Para demostrar la corrección utilizamos inducción sobre `veces`.
+```Scala
+factorial(5)
+```
 
-**Caso base:** para `veces <= 0`, no se ejecuta la orden y se devuelve `e`, que coincide con la especificación.
+### Paso 1: Llamada inicial
 
-**Hipótesis de inducción:** suponemos que ejecutar una orden `k` veces produce el estado correcto.
+```Scala
+loop(5, 1)
+```
 
-**Paso inductivo:** para `k + 1` repeticiones, primero se ejecuta la orden una vez, obteniendo el estado correcto después de una ejecución. Después se ejecuta recursivamente la misma orden `k` veces. Por la hipótesis de inducción, las `k` ejecuciones restantes producen el estado correcto.
+### Paso 2: Primera iteración
 
-Por lo tanto, la ejecución de `k + 1` repeticiones también es correcta.
+```Scala
+loop(4, 5)   // acumulador = 1 * 5
+```
 
-Además, en cada llamada recursiva el número de repeticiones disminuye en uno, por lo que finalmente se alcanza el caso base.
+### Paso 3: Segunda iteración
 
-## 3.4. Caso `Secuencia(Nil)`
+```Scala
+loop(3, 20)  // acumulador = 5 * 4
+```
 
-Una secuencia vacía no contiene órdenes que ejecutar.
+### Paso 4: Tercera iteración
 
-La implementación devuelve directamente el estado recibido:
+```Scala
+loop(2, 60)  // acumulador = 20 * 3
+```
 
-\[
-ejecutar(e,Secuencia(Nil))=e
-\]
+### Paso 5: Cuarta iteración
 
-Esto coincide con la especificación.
+```Scala
+loop(1, 120) // acumulador = 60 * 2
+```
 
-Por lo tanto, el caso `Secuencia(Nil)` es correcto.
+### Paso 6: Caso base
 
-## 3.5. Caso `Secuencia(orden :: resto)`
+```Scala
+return 120
+```
 
-En este caso, la secuencia contiene una primera orden y una lista de órdenes restantes.
+---
 
-La función ejecuta primero:
+## Diferencia con recursión normal
 
-\[
-e'=ejecutar(e,orden)
-\]
+* En **recursión normal** cada llamada queda en la pila esperando a que termine la siguiente, lo que puede causar desbordamiento si `n` es muy grande.
+* En **recursión de cola**, el compilador transforma el proceso en un **bucle optimizado**, por lo que no se guarda cada llamada en la pila y el algoritmo puede ejecutarse para valores muy grandes sin problema.
 
-y posteriormente ejecuta el resto de la secuencia desde el estado `e'`.
+---
 
-Para demostrar la corrección utilizamos inducción estructural sobre la lista de órdenes.
+## Ejemplo de uso
 
-### Caso base
+```Scala
+val resultado = factorial(5)
+println(resultado)  // 120
+```
 
-Cuando la lista está vacía, se obtiene `Secuencia(Nil)`, cuyo comportamiento ya fue demostrado como correcto.
+El resultado de `factorial(5)` es `120`.
 
-### Hipótesis de inducción
 
-Suponemos que la ejecución del `resto` de la secuencia es correcta para cualquier estado inicial.
+## Diagrama de llamados de pila con recursión de cola
 
-### Paso inductivo
+```mermaid
+sequenceDiagram
+    participant Main as factorial(5)
+    participant L1 as loop(5, 1)
+    participant L2 as loop(4, 5)
+    participant L3 as loop(3, 20)
+    participant L4 as loop(2, 60)
+    participant L5 as loop(1, 120)
 
-Consideremos una secuencia:
+    Main->>L1: llamada inicial
+    L1->>L2: tail call con (4, 5)
+    L2->>L3: tail call con (3, 20)
+    L3->>L4: tail call con (2, 60)
+    L4->>L5: tail call con (1, 120)
+    L5-->>Main: return 120
+```
 
-\[
-orden :: resto
-\]
 
-Primero se ejecuta `orden` sobre el estado `e`.
-
-Como cada alternativa de una orden básica es correcta, se obtiene el estado correcto `e'`.
-
-Después se ejecuta `resto` desde `e'`.
-
-Por la hipótesis de inducción, la ejecución del resto de la secuencia también es correcta.
-
-Por lo tanto, la secuencia completa se ejecuta correctamente y en el orden establecido.
-
-Además, en cada llamada recursiva se elimina la primera orden de la lista. Como las listas utilizadas son finitas, eventualmente se llega a `Nil`.
-
-## 4. Terminación
-
-La función `girar` siempre termina porque realiza un número finito de comparaciones mediante `match`.
-
-En `ejecutar`, los casos `Avanzar` y `Girar` no realizan llamadas recursivas.
-
-En `Repetir`, el número de repeticiones disminuye en uno en cada llamada recursiva hasta llegar al caso base.
-
-En `Secuencia`, la lista de órdenes pierde un elemento en cada llamada recursiva hasta llegar a `Nil`.
-
-Por lo tanto, para órdenes finitas y un número finito de repeticiones, la función termina.
-
-## 5. Conclusión
-
-Se ha demostrado la corrección de las funciones correspondientes a los puntos 1 y 2 del taller.
-
-La función `girar` es correcta porque contempla todas las combinaciones posibles entre las direcciones y los sentidos de giro.
-
-La función `ejecutar` es correcta porque cada una de las alternativas de `Orden` cumple su especificación. Los casos recursivos `Repetir` y `Secuencia` conservan la corrección mediante inducción y terminan porque el número de repeticiones o la longitud de la lista disminuyen en cada llamada.
-
-Por lo tanto, las funciones desarrolladas producen el estado esperado del robot para las órdenes váli

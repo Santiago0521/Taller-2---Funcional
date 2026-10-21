@@ -1,279 +1,299 @@
-# Ejemplo de informe de corrección
+# Informe de corrección
 
-Fundamentos de Programación Funcional y Concurrente.
-Documento realizado por el docente Juan Francisco Díaz.
+**Asignatura:** Fundamentos de Programación Funcional y Concurrente  
+**Taller 2:** Un robot en la cuadrícula
 
-## 1. Argumentar la corrección de programas recursivos
+## 1. Introducción
 
-Sea $f : A \to B$ una función, y $A$ un conjunto definido recursivamente
-(recordar la definición de Matemáticas Discretas I), como por ejemplo los
-naturales o las listas.
+En este documento se argumenta la corrección de las funciones `girar` y `ejecutar`, correspondientes a los puntos 1 y 2 del taller.
 
-Sea $P_f$ un programa recursivo (lineal o en árbol) desarrollado en Scala (o en
-cualquier lenguaje de programación) hecho para calcular $f$:
+Para justificar la corrección se analiza el comportamiento de cada función con respecto a su especificación.
 
-```scala
-def Pf(a: A): B = { // Pf recibe a de tipo A, y devuelve f(a) de tipo B
-  ...
-}
-```
+En la función `girar` se utiliza un análisis de casos. Para la función `ejecutar` se analiza cada alternativa del tipo recursivo `Orden` y se utiliza inducción estructural en los casos recursivos.
 
-¿Cómo argumentar que $P_f(a)$ siempre devuelve $f(a)$ como respuesta? Es decir,
-¿cómo argumentar que $P_f$ es correcto con respecto a su especificación?
+## 2. Corrección de la función `girar`
 
-La respuesta es sencilla: demostrando el siguiente teorema.
-
-```math
-\forall a \in A : P_f(a) == f(a)
-```
-
-Cuando uno tiene que demostrar que algo se cumple para todos los elementos de
-un conjunto definido recursivamente, es natural usar inducción estructural. En
-términos prácticos, esto significa demostrar que:
-
-- Para cada valor básico $a$ de $A$, se tiene que $P_f(a) == f(a)$.
-- Para cada valor $a \in A$ construido recursivamente a partir de otro(s)
-  valor(es) $a' \in A$, se tiene que
-  $P_f(a') == f(a') \rightarrow P_f(a) == f(a)$. (Esta es la hipótesis de
-  inducción).
-
-### Ejemplo: factorial recursivo
-
-Sea $f : \mathbb{N} \to \mathbb{N}$ la función que calcula el factorial de un
-número natural, es decir, $f(n) = n!$. Y sea $P_f$ el siguiente programa en
-Scala:
+La función tiene la siguiente especificación:
 
 ```scala
-def Pf(n: Int): Int = { // Pf recibe n de tipo Int, y devuelve n! de tipo Int
-  if (n == 0) 1 else n * Pf(n - 1)
-}
+def girar(d: Direccion, s: Sentido): Direccion
 ```
 
-Vamos a demostrar que $\forall n \in \mathbb{N} : P_f(n) == n!$
+Su objetivo es devolver la dirección resultante de girar 90 grados desde la dirección `d`, siguiendo el sentido `s`.
 
-**Caso base:** $n = 0$
+### 2.1. Especificación matemática
 
-```math
-P_f(0) \rightarrow \text{if } (0 == 0)\ 1 \text{ else } 0 \ast P_f(-1) \rightarrow 1
-```
+Las direcciones posibles son:
 
-Por otro lado, $f(0) = 0! = 1$. Entonces $P_f(0) == f(0)$.
+\[
+D = \{Norte, Este, Sur, Oeste\}
+\]
 
-**Caso de inducción:** $n = k + 1$, $k \geq 0$. Hay que demostrar:
-$P_f(k) == f(k) \rightarrow P_f(k + 1) == f(k + 1)$
+Los sentidos posibles son:
 
-```math
-P_f(k+1) \rightarrow \text{if } (k+1 == 0)\ 1 \text{ else } (k+1) \ast P_f(k) \rightarrow (k+1) \ast P_f(k)
-```
+\[
+S = \{Izquierda, Derecha\}
+\]
 
-Usando la hipótesis de inducción (HI):
+Por lo tanto, existen ocho combinaciones posibles entre una dirección y un sentido.
 
-```math
-\rightarrow (k+1) \ast k! = (k+1)!
-```
+La especificación de la función es:
 
-Por lo tanto, $P_f(k + 1) == f(k + 1)$.
+| Dirección | Derecha | Izquierda |
+|---|---|---|
+| Norte | Este | Oeste |
+| Este | Sur | Norte |
+| Sur | Oeste | Este |
+| Oeste | Norte | Sur |
 
-Concluimos por inducción que $\forall n \in \mathbb{N} : P_f(n) == n!$
+### 2.2. Demostración por análisis de casos
 
-### Ejemplo: el máximo de una lista
+La implementación utiliza `match` sobre el par `(d, s)` y contempla las ocho combinaciones posibles.
 
-Sea $f : \text{List}[\mathbb{N}] \to \mathbb{N}$ la función que calcula el
-máximo de una lista de enteros positivos, no vacía. Y sea $P_f$ el siguiente
-programa en Scala:
+Para el sentido `Derecha`:
+
+- Si `d = Norte`, el resultado es `Este`.
+- Si `d = Este`, el resultado es `Sur`.
+- Si `d = Sur`, el resultado es `Oeste`.
+- Si `d = Oeste`, el resultado es `Norte`.
+
+Estos resultados corresponden a un giro de 90 grados hacia la derecha.
+
+Para el sentido `Izquierda`:
+
+- Si `d = Norte`, el resultado es `Oeste`.
+- Si `d = Oeste`, el resultado es `Sur`.
+- Si `d = Sur`, el resultado es `Este`.
+- Si `d = Este`, el resultado es `Norte`.
+
+Estos resultados corresponden a un giro de 90 grados hacia la izquierda.
+
+Las ocho combinaciones posibles están contempladas en la función. Por lo tanto, para cualquier dirección y sentido válidos, la función devuelve la dirección correspondiente.
+
+En consecuencia, `girar` es correcta con respecto a su especificación.
+
+## 3. Corrección de la función `ejecutar`
+
+La función tiene la siguiente especificación:
 
 ```scala
-def maxLin(l: List[Int]): Int = {
-  if (l.tail.isEmpty) l.head
-  else math.max(maxLin(l.tail), l.head)
-}
+def ejecutar(e: Estado, o: Orden): Estado
 ```
 
-Demostraremos que:
+Su objetivo es devolver el estado que resulta de aplicar la orden `o` al estado inicial `e`.
 
-```math
-\forall n \in \mathbb{N} \setminus \{0\} : P_f(\text{List}(a_1, a_2, \ldots, a_n)) == f(\text{List}(a_1, a_2, \ldots, a_n))
-```
+Un estado puede representarse como:
 
-**Caso base:** $n = 1$
+\[
+e = (x,y,d)
+\]
 
-```math
-P_f(\text{List}(a_1)) \rightarrow \text{if } \text{List}(a_1).\text{tail.isEmpty then } \text{List}(a_1).\text{head else } \ldots \rightarrow \text{List}(a_1).\text{head} \rightarrow a_1
-```
+donde `x` e `y` representan las coordenadas del robot y `d` representa su dirección.
 
-Por otro lado, $f(\text{List}(a_1)) = a_1$. Entonces
-$P_f(\text{List}(a_1)) == f(\text{List}(a_1))$.
+La demostración se realiza analizando cada alternativa del tipo `Orden`.
 
-**Caso de inducción:** $n = k + 1$, $k \geq 1$. Se debe demostrar:
+## 3.1. Caso `Avanzar(n)`
 
-```math
-P_f(\text{List}(b_1, b_2, \ldots, b_k)) == f(\text{List}(b_1, b_2, \ldots, b_k)) \rightarrow P_f(\text{List}(a_1, a_2, \ldots, a_{k+1})) == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))
-```
+La especificación establece que el robot debe desplazarse `n` unidades en la dirección hacia la que está orientado.
 
-Empecemos por calcular qué devuelve $P_f$ usando el modelo de sustitución:
+Si:
 
-```math
-P_f(L) \rightarrow \text{if } L.\text{tail.isEmpty then } L.\text{head else math.max}(P_f(L.\text{tail}), L.\text{head})
-```
+\[
+e=(x,y,Norte)
+\]
 
-```math
-\rightarrow \text{math.max}(P_f(\text{List}(a_2, \ldots, a_{k+1})), a_1)
-```
+entonces:
 
-Sea $b = P_f(\text{List}(a_2, \ldots, a_{k+1}))$; por la hipótesis de
-inducción, $b = f(\text{List}(a_2, \ldots, a_{k+1}))$. Hay dos posibilidades:
+\[
+ejecutar(e,Avanzar(n))=(x,y+n,Norte)
+\]
 
-- Si $\text{math.max}(b, a_1) = b$, entonces $b \geq a_1$ y
- $b == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))$.
-- Si $\text{math.max}(b, a_1) = a_1$, entonces $a_1 \geq b$ y
- $a_1 == f(\text{List}(a_1, a_2, \ldots, a_{k+1}))$.
+Si:
 
-Por lo tanto, $P_f(L) == f(L)$.
+\[
+e=(x,y,Este)
+\]
 
-Concluimos por inducción que:
+entonces:
 
-```math
-\forall n \in \mathbb{N} \setminus \{0\} : P_f(\text{List}(a_1, a_2, \ldots, a_n)) == f(\text{List}(a_1, a_2, \ldots, a_n))
-```
+\[
+ejecutar(e,Avanzar(n))=(x+n,y,Este)
+\]
 
-## 2. Argumentar la corrección de programas iterativos
+Si:
 
-Para argumentar la corrección de programas iterativos, se debe formalizar cómo
-es la iteración. Esto implica definir:
+\[
+e=(x,y,Sur)
+\]
 
-- Cómo se representa un estado de la iteración, $s$.
-- Cuál es el estado inicial, $s_0$.
-- Cuál es el estado final (o cómo se reconoce que un estado es final): $s_f$.
-- Qué condición (o predicado) cumple todo estado: $\text{Inv}(s)$ (invariante
-  de la iteración).
-- El mecanismo para pasar de un estado al siguiente: $\text{transformar}(s)$.
-  Si $s_i$ es el estado $i$, entonces $\text{transformar}(s_i) = s_{i+1}$.
+entonces:
 
-Un programa iterativo tiene la siguiente forma:
+\[
+ejecutar(e,Avanzar(n))=(x,y-n,Sur)
+\]
 
-```scala
-def Pf(a: A): B = { // Pf recibe a de tipo A, y devuelve f(a) de tipo B
-  def Pf_iter(s: Estado): B =
-    if (esFinal(s)) respuesta(s) else Pf_iter(transformar(s))
-  Pf_iter(s0)
-}
-```
+Si:
 
-Demostración de corrección:
+\[
+e=(x,y,Oeste)
+\]
 
-- $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
-- Si $(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$:
-  el nuevo estado cumple la condición invariante si el estado anterior la
-  cumplía.
-- De lo anterior se concluye $\text{Inv}(s_f)$, es decir, el estado final
-  cumple la condición invariante. Luego,
-  $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$.
-- Finalmente, demostrar que siempre se llega al estado final $s_f$. Esto
-  implica que
-  $P_f(a) == \text{iter}(s_0) == \text{respuesta}(s_f) == f(a)$.
+entonces:
 
-### Ejemplo: factorial iterativo
+\[
+ejecutar(e,Avanzar(n))=(x-n,y,Oeste)
+\]
 
-Considere el siguiente programa iterativo en Scala para calcular la función
-factorial:
+En todos los casos se modifica únicamente la coordenada correspondiente al desplazamiento y se conserva la dirección.
 
-```scala
-def Pf(n: Int): Int = { // Pf recibe n de tipo Int, y devuelve n! de tipo Int
-  def Pf_iter(i: Int, n: Int, ac: Int): Int =
-    if (i > n) ac else Pf_iter(i + 1, n, i * ac)
-  Pf_iter(1, n, 1)
-}
-```
+Además, cuando `n` es negativo, las mismas expresiones producen un desplazamiento en sentido contrario.
 
-Este programa implementa el siguiente proceso iterativo:
+Por lo tanto, el caso `Avanzar(n)` es correcto.
 
-- Un estado $s = (i, n, ac)$.
-- El estado inicial es $s_0 = (1, n, 1)$.
-- $(i, n, ac)$ es final si $i > n$, o lo que es lo mismo, si $i = n + 1$.
-- La invariante de ciclo es
-  $\text{Inv}(i, n, ac) \equiv i \leq n + 1 \land ac = (i-1)!$.
-  La invariante de ciclo es una relación que SIEMPRE se cumple en el ciclo.
-- $\text{transformar}((i, n, ac)) = (i+1, n, i \ast ac)$.
+## 3.2. Caso `Girar(sentido)`
 
-Ahora, demostramos los puntos mencionados:
+La orden `Girar(sentido)` debe cambiar la orientación del robot sin modificar su posición.
 
-**1.** $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
+La implementación produce:
 
-```math
-s_0 = (1, n, 1) \implies 1 \leq n + 1 \land 1 = 0!
-```
+\[
+(x,y,girar(d,s))
+\]
 
-**2.** La invariante se mantiene con la transformación de estados,
-$(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$:
+donde `d` es la dirección actual y `s` es el sentido del giro.
 
-1. Primer cambio, $i = i + 1$, lo que implica $ac = ((i+1) - 1)! = i!$.
-2. Segundo cambio, $ac = i \ast ac$, entonces $ac = (i - 1)! \ast i = i!$.
-3. Como se puede ver en ambos cambios indicados en la transformación, la
-   invariante se mantiene.
+Como se demostró anteriormente que `girar` es correcta, la nueva dirección corresponde al giro solicitado.
 
-**3.** $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$
+Las coordenadas `x` e `y` permanecen iguales.
 
-```math
-(n + 1 \leq n + 1) \land ac = ((n+1)-1)! \rightarrow ac == n!
-```
+Por lo tanto, el caso `Girar(sentido)` es correcto.
 
-**4.** En cada paso, la componente $i$ del estado incrementa, acercándose a $n+1$.
-Después de $n$ iteraciones, se alcanza $n+1$.
+## 3.3. Caso `Repetir(veces, orden)`
 
-Esto implica que $P_f(n) == \text{iter}(1, n, 1) == n!$
+La orden `Repetir` ejecuta una orden varias veces.
 
-### Ejemplo: el máximo de una lista
+### Caso base
 
-Se desea calcular el máximo de una lista de enteros positivos, no vacía. Sea
-$f : \text{List}[\mathbb{N}] \to \mathbb{N}$ la función que calcula ese valor.
-Y sea $P_f$ el siguiente programa en Scala:
+Si:
 
-```scala
-def maxIt(l: List[Int]): Int = {
-  def maxAux(max: Int, l: List[Int]): Int = {
-    if (l.isEmpty) max
-    else maxAux(math.max(max, l.head), l.tail)
-  }
-  maxAux(l.head, l.tail)
-}
-```
+\[
+veces \leq 0
+\]
 
-Este programa implementa el siguiente proceso iterativo:
+la función devuelve el estado original:
 
-- Un estado $s = (max, l)$ donde $l = \text{List}(a_i, a_{i+1}, \ldots, a_k)$
-  es una cola de $L$.
-- El estado inicial es
-  $s_0 = (L.\text{head}, L.\text{tail}) = (a_1, \text{List}(a_2, \ldots, a_k))$.
-- $s = (max, l)$ es final si $l$ es vacía.
-- $\text{Inv}(max, l) \equiv l = \text{List}(a_i, a_{i+1}, \ldots, a_k) \land max = f(\text{List}(a_1, a_2, \ldots, a_{i-1}))$.
-- $\text{transformar}((max, l)) = (nmax, l.\text{tail})$ donde $nmax = max$ si
-  $max \geq l.\text{head}$, y $nmax = l.\text{head}$ si no.
+\[
+ejecutar(e,Repetir(veces,orden))=e
+\]
 
-Demostración de los puntos:
+Esto es correcto porque una cantidad de repeticiones igual a cero o negativa no debe producir ningún movimiento.
 
-**1.** $\text{Inv}(s_0)$: el estado inicial cumple la condición invariante.
+### Caso recursivo
 
-```math
-s_0 = (a_1, \text{List}(a_2, \ldots, a_k)) \implies a_1 = f(\text{List}(a_1))
-```
+Si:
 
-**2.** $(s_i \neq s_f \land \text{Inv}(s_i)) \rightarrow \text{Inv}(\text{transformar}(s_i))$
+\[
+veces > 0
+\]
 
-```math
-\neg\, l.\text{isEmpty} \land l = \text{List}(a_i, a_{i+1}, \ldots, a_k) \land max = f(\text{List}(a_1, a_2, \ldots, a_{i-1}))
-```
+la función ejecuta primero la orden una vez:
 
-```math
-\rightarrow l.\text{tail} = \text{List}(a_{i+1}, \ldots, a_k) \land nmax = f(\text{List}(a_1, \ldots, a_i))
-```
+\[
+e' = ejecutar(e,orden)
+\]
 
-**3.** $\text{Inv}(s_f) \rightarrow \text{respuesta}(s_f) == f(a)$
+y después ejecuta la misma orden con una repetición menos:
 
-```math
-\text{Inv}((max, \text{List}())) \rightarrow max = f(\text{List}(a_1, \ldots, a_k))
-```
+\[
+ejecutar(e',Repetir(veces-1,orden))
+\]
 
-**4.** En cada paso, la lista $l$ se reduce, acercándose a ser vacía. Después de
-$k$ iteraciones, $l = \text{List}()$.
+Para demostrar la corrección utilizamos inducción sobre `veces`.
 
-Esto implica que $P_f(L) == \text{maxAux}(L.\text{head}, L.\text{tail}) == f(L)$
+**Caso base:** para `veces <= 0`, no se ejecuta la orden y se devuelve `e`, que coincide con la especificación.
+
+**Hipótesis de inducción:** suponemos que ejecutar una orden `k` veces produce el estado correcto.
+
+**Paso inductivo:** para `k + 1` repeticiones, primero se ejecuta la orden una vez, obteniendo el estado correcto después de una ejecución. Después se ejecuta recursivamente la misma orden `k` veces. Por la hipótesis de inducción, las `k` ejecuciones restantes producen el estado correcto.
+
+Por lo tanto, la ejecución de `k + 1` repeticiones también es correcta.
+
+Además, en cada llamada recursiva el número de repeticiones disminuye en uno, por lo que finalmente se alcanza el caso base.
+
+## 3.4. Caso `Secuencia(Nil)`
+
+Una secuencia vacía no contiene órdenes que ejecutar.
+
+La implementación devuelve directamente el estado recibido:
+
+\[
+ejecutar(e,Secuencia(Nil))=e
+\]
+
+Esto coincide con la especificación.
+
+Por lo tanto, el caso `Secuencia(Nil)` es correcto.
+
+## 3.5. Caso `Secuencia(orden :: resto)`
+
+En este caso, la secuencia contiene una primera orden y una lista de órdenes restantes.
+
+La función ejecuta primero:
+
+\[
+e'=ejecutar(e,orden)
+\]
+
+y posteriormente ejecuta el resto de la secuencia desde el estado `e'`.
+
+Para demostrar la corrección utilizamos inducción estructural sobre la lista de órdenes.
+
+### Caso base
+
+Cuando la lista está vacía, se obtiene `Secuencia(Nil)`, cuyo comportamiento ya fue demostrado como correcto.
+
+### Hipótesis de inducción
+
+Suponemos que la ejecución del `resto` de la secuencia es correcta para cualquier estado inicial.
+
+### Paso inductivo
+
+Consideremos una secuencia:
+
+\[
+orden :: resto
+\]
+
+Primero se ejecuta `orden` sobre el estado `e`.
+
+Como cada alternativa de una orden básica es correcta, se obtiene el estado correcto `e'`.
+
+Después se ejecuta `resto` desde `e'`.
+
+Por la hipótesis de inducción, la ejecución del resto de la secuencia también es correcta.
+
+Por lo tanto, la secuencia completa se ejecuta correctamente y en el orden establecido.
+
+Además, en cada llamada recursiva se elimina la primera orden de la lista. Como las listas utilizadas son finitas, eventualmente se llega a `Nil`.
+
+## 4. Terminación
+
+La función `girar` siempre termina porque realiza un número finito de comparaciones mediante `match`.
+
+En `ejecutar`, los casos `Avanzar` y `Girar` no realizan llamadas recursivas.
+
+En `Repetir`, el número de repeticiones disminuye en uno en cada llamada recursiva hasta llegar al caso base.
+
+En `Secuencia`, la lista de órdenes pierde un elemento en cada llamada recursiva hasta llegar a `Nil`.
+
+Por lo tanto, para órdenes finitas y un número finito de repeticiones, la función termina.
+
+## 5. Conclusión
+
+Se ha demostrado la corrección de las funciones correspondientes a los puntos 1 y 2 del taller.
+
+La función `girar` es correcta porque contempla todas las combinaciones posibles entre las direcciones y los sentidos de giro.
+
+La función `ejecutar` es correcta porque cada una de las alternativas de `Orden` cumple su especificación. Los casos recursivos `Repetir` y `Secuencia` conservan la corrección mediante inducción y terminan porque el número de repeticiones o la longitud de la lista disminuyen en cada llamada.
+
+Por lo tanto, las funciones desarrolladas producen el estado esperado del robot para las órdenes váli
