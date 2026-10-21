@@ -38,7 +38,15 @@ class RobotCuadricula {
     case Secuencia(ordenes) => ordenes.map(cuantasBasicas).sum
   }
   /** Niveles de anidamiento: una básica tiene 1, una compuesta uno más que la más honda. */
-  def profundidad(o: Orden): Int = ???
+  def profundidad(o: Orden): Int = o match {
+    case Avanzar(_) => 1
+    case Girar(_) => 1
+    
+    case Repetir(_, orden) => 1 + profundidad(orden)
+    
+    case Secuencia(ordenes) => 
+      1 + ordenes.map(profundidad).foldLeft(0)(_ max _)
+  }
 
   // Punto 4 -------------------------------------------------------------------
 
