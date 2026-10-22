@@ -25,15 +25,15 @@ Su objetivo es devolver la dirección resultante de girar 90 grados desde la dir
 
 Las direcciones posibles son:
 
-\[
+$$
 D = \{Norte, Este, Sur, Oeste\}
-\]
+$$
 
 Los sentidos posibles son:
 
-\[
+$$
 S = \{Izquierda, Derecha\}
-\]
+$$
 
 Por lo tanto, existen ocho combinaciones posibles entre una dirección y un sentido.
 
@@ -84,9 +84,9 @@ Su objetivo es devolver el estado que resulta de aplicar la orden `o` al estado 
 
 Un estado puede representarse como:
 
-\[
+$$
 e = (x,y,d)
-\]
+$$
 
 donde `x` e `y` representan las coordenadas del robot y `d` representa su dirección.
 
@@ -98,51 +98,51 @@ La especificación establece que el robot debe desplazarse `n` unidades en la di
 
 Si:
 
-\[
+$$
 e=(x,y,Norte)
-\]
+$$
 
 entonces:
 
-\[
+$$
 ejecutar(e,Avanzar(n))=(x,y+n,Norte)
-\]
+$$
 
 Si:
 
-\[
+$$
 e=(x,y,Este)
-\]
+$$
 
 entonces:
 
-\[
+$$
 ejecutar(e,Avanzar(n))=(x+n,y,Este)
-\]
+$$
 
 Si:
 
-\[
+$$
 e=(x,y,Sur)
-\]
+$$
 
 entonces:
 
-\[
+$$
 ejecutar(e,Avanzar(n))=(x,y-n,Sur)
-\]
+$$
 
 Si:
 
-\[
+$$
 e=(x,y,Oeste)
-\]
+$$
 
 entonces:
 
-\[
+$$
 ejecutar(e,Avanzar(n))=(x-n,y,Oeste)
-\]
+$$
 
 En todos los casos se modifica únicamente la coordenada correspondiente al desplazamiento y se conserva la dirección.
 
@@ -156,9 +156,9 @@ La orden `Girar(sentido)` debe cambiar la orientación del robot sin modificar s
 
 La implementación produce:
 
-\[
+$$
 (x,y,girar(d,s))
-\]
+$$
 
 donde `d` es la dirección actual y `s` es el sentido del giro.
 
@@ -176,15 +176,15 @@ La orden `Repetir` ejecuta una orden varias veces.
 
 Si:
 
-\[
+$$
 veces \leq 0
-\]
+$$
 
 la función devuelve el estado original:
 
-\[
+$$
 ejecutar(e,Repetir(veces,orden))=e
-\]
+$$
 
 Esto es correcto porque una cantidad de repeticiones igual a cero o negativa no debe producir ningún movimiento.
 
@@ -192,21 +192,21 @@ Esto es correcto porque una cantidad de repeticiones igual a cero o negativa no 
 
 Si:
 
-\[
+$$
 veces > 0
-\]
+$$
 
 la función ejecuta primero la orden una vez:
 
-\[
+$$
 e' = ejecutar(e,orden)
-\]
+$$
 
 y después ejecuta la misma orden con una repetición menos:
 
-\[
+$$
 ejecutar(e',Repetir(veces-1,orden))
-\]
+$$
 
 Para demostrar la corrección utilizamos inducción sobre `veces`.
 
@@ -226,9 +226,9 @@ Una secuencia vacía no contiene órdenes que ejecutar.
 
 La implementación devuelve directamente el estado recibido:
 
-\[
+$$
 ejecutar(e,Secuencia(Nil))=e
-\]
+$$
 
 Esto coincide con la especificación.
 
@@ -240,9 +240,9 @@ En este caso, la secuencia contiene una primera orden y una lista de órdenes re
 
 La función ejecuta primero:
 
-\[
+$$
 e'=ejecutar(e,orden)
-\]
+$$
 
 y posteriormente ejecuta el resto de la secuencia desde el estado `e'`.
 
@@ -260,9 +260,9 @@ Suponemos que la ejecución del `resto` de la secuencia es correcta para cualqui
 
 Consideremos una secuencia:
 
-\[
+$$
 orden :: resto
-\]
+$$
 
 Primero se ejecuta `orden` sobre el estado `e`.
 
@@ -294,6 +294,4 @@ Se ha demostrado la corrección de las funciones correspondientes a los puntos 1
 
 La función `girar` es correcta porque contempla todas las combinaciones posibles entre las direcciones y los sentidos de giro.
 
-La función `ejecutar` es correcta porque cada una de las alternativas de `Orden` cumple su especificación. Los casos recursivos `Repetir` y `Secuencia` conservan la corrección mediante inducción y terminan porque el número de repeticiones o la longitud de la lista disminuyen en cada llamada.
-
-Por lo tanto, las funciones desarrolladas producen el estado esperado del robot para las órdenes váli
+La función `ejecutar` es correcta porque cada una de
