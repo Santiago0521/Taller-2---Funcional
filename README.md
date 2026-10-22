@@ -16,10 +16,8 @@ la nota.
 
 | Nombre completo | Código |
 |---|---|
-| | |
-| | |
-| | |
-| | |
+| Santiago Vasquez Valencia | 202611028 |
+| Valentina Cifuentes Badillo | 202611030 |
 
 ## Cómo está organizado el proyecto
 
