@@ -294,4 +294,6 @@ Se ha demostrado la corrección de las funciones correspondientes a los puntos 1
 
 La función `girar` es correcta porque contempla todas las combinaciones posibles entre las direcciones y los sentidos de giro.
 
-La función `ejecutar` es correcta porque cada una de
+La función `ejecutar` es correcta porque cada una de las alternativas de `Orden` cumple su especificación. Los casos recursivos `Repetir` y `Secuencia` conservan la corrección mediante inducción y terminan porque el número de repeticiones o la longitud de la lista disminuyen en cada llamada.
+
+Por lo tanto, las funciones desarrolladas producen el estado esperado del robot para las órdenes válidas consideradas.
