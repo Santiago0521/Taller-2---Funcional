@@ -98,11 +98,11 @@ ejecutar(inicial, orden)
 
 ```mermaid
 flowchart TD
-    A["Estado inicial: (0, 0, Norte)"] --> B{"¿Quedan repeticiones?"}
-    B -->|Sí| C["Avanzar una unidad"]
-    C --> D["Girar a la derecha"]
+    A["Estado inicial: <br>(0, 0, Norte)"] --> B{"¿Quedan <br>repeticiones?"}
+    B -->|Sí| C["Avanzar una <br>unidad"]
+    C --> D["Girar a la <br>derecha"]
     D --> B
-    B -->|No| E["Estado final: (0, 0, Norte)"]
+    B -->|No| E["Estado final: <br>(0, 0, Norte)"]
 ```
 
 El diagrama resume el comportamiento de la repetición: cada iteración ejecuta primero el avance y después el giro. Al agotarse las cuatro repeticiones, se devuelve el estado final.
@@ -370,14 +370,14 @@ simplificar(
 
 ```mermaid
 flowchart TD
-    A["Secuencia original"] --> B["Simplificar cada elemento"]
-    B --> C["Avanzar(2), Avanzar(3), Avanzar(4), Secuencia(Nil), Girar(Derecha)"]
-    C --> D["Combinar Avanzar(2) y Avanzar(3)"]
-    D --> E["Avanzar(5), Avanzar(4), Secuencia(Nil), Girar(Derecha)"]
-    E --> F["Combinar Avanzar(5) y Avanzar(4)"]
-    F --> G["Avanzar(9), Secuencia(Nil), Girar(Derecha)"]
-    G --> H["Eliminar Secuencia(Nil)"]
-    H --> I["Secuencia(List(Avanzar(9), Girar(Derecha)))"]
+    A["Secuencia <br>original"] --> B["Simplificar <br>cada elemento"]
+    B --> C["Avanzar(2), <br>Avanzar(3), <br>Avanzar(4), <br>Secuencia(Nil), <br>Girar(Derecha)"]
+    C --> D["Combinar <br>Avanzar(2) y <br>Avanzar(3)"]
+    D --> E["Avanzar(5), <br>Avanzar(4), <br>Secuencia(Nil), <br>Girar(Derecha)"]
+    E --> F["Combinar <br>Avanzar(5) y <br>Avanzar(4)"]
+    F --> G["Avanzar(9), <br>Secuencia(Nil), <br>Girar(Derecha)"]
+    G --> H["Eliminar <br>Secuencia(Nil)"]
+    H --> I["Secuencia<br>(List(Avanzar(9), <br>Girar(Derecha)))"]
 ```
 
 El resultado conserva el avance total de nueve unidades y el giro a la derecha, pero elimina instrucciones innecesarias y combina los avances consecutivos.
